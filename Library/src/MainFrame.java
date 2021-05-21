@@ -6,9 +6,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -23,6 +25,7 @@ public class MainFrame extends JFrame {
 
 	private Connection conn = null;
 	private PreparedStatement state = null;
+	private ResultSet result = null;
 	int id = -1;
 
 //   create JTabbedPane
@@ -43,10 +46,12 @@ public class MainFrame extends JFrame {
 	JPanel upPanelBooks = new JPanel();
 	JPanel upPanelReaders = new JPanel();
 	JPanel upPanelInfo = new JPanel();
+	JPanel upPanelSearch = new JPanel();
 	// -------------------------------------------------- readers
 	JPanel middlePanelBooks = new JPanel();
 	JPanel middlePanelReaders = new JPanel();
 	JPanel middlePanelInfo = new JPanel();
+	JPanel middlePanelSearch = new JPanel();
 	// -------------------------------------------------- info
 	JPanel downPanelBooks = new JPanel();
 	JPanel downPanelReaders = new JPanel();
@@ -55,23 +60,34 @@ public class MainFrame extends JFrame {
 	JPanel booksPanel = new JPanel();
 	JPanel readersPanel = new JPanel();
 	JPanel infoPanel = new JPanel();
+	JPanel searchPanel = new JPanel();
 
 //	 create JButton
 	// -------------------------------------------------- books
 	JButton addButtonBooks = new JButton("Add");
 	JButton deleteButtonBooks = new JButton("Delete");
 	JButton editButtonBooks = new JButton("Edit");
-	JButton searchButtonBooks = new JButton("Search");
+	JButton searchButtonBooks = new JButton("Seacrh");
+	JButton restartButtonBooks = new JButton("Restart");
+	JComboBox<String> comboBoxBooks = new JComboBox<String>();
 	// -------------------------------------------------- readers
 	JButton addButtonReaders = new JButton("Add");
 	JButton deleteButtonReaders = new JButton("Delete");
 	JButton editButtonReaders = new JButton("Edit");
-	JButton searchButtonReaders = new JButton("Search");
+	JButton searchButtonReaders = new JButton("Seacrh");
+	JButton restartButtonReaders = new JButton("Restart");
+	JComboBox<String> comboBoxReaders = new JComboBox<String>();
 	// -------------------------------------------------- info
 	JButton addButtonInfo = new JButton("Add");
 	JButton deleteButtonInfo = new JButton("Delete");
 	JButton editButtonInfo = new JButton("Edit");
-	JButton searchButtonInfo = new JButton("Search");
+	JButton searchButtonInfo = new JButton("Seacrh");
+	JButton restartButtonInfo = new JButton("Restart");
+	JComboBox<String> comboBoxInfo = new JComboBox<String>();
+	// -------------------------------------------------- search
+	JButton searchButton = new JButton("Seacrh");
+	JComboBox<String> comboBoxSearchBooks = new JComboBox<String>();
+	JComboBox<String> comboBoxSearchReaders = new JComboBox<String>();
 
 //	 create JLabel
 
@@ -143,6 +159,7 @@ public class MainFrame extends JFrame {
 		tab.add(booksPanel, "Books");
 		tab.add(readersPanel, "Readers");
 		tab.add(infoPanel, "Info");
+		tab.add(searchPanel, "Search");
 
 //		 upPanel
 		// -------------------------------------------------- books
@@ -150,6 +167,8 @@ public class MainFrame extends JFrame {
 		upPanelBooks.add(deleteButtonBooks);
 		upPanelBooks.add(editButtonBooks);
 		upPanelBooks.add(searchButtonBooks);
+		upPanelBooks.add(restartButtonBooks);
+		upPanelBooks.add(comboBoxBooks);
 
 		// -------------------------------------------------- readers
 
@@ -157,12 +176,22 @@ public class MainFrame extends JFrame {
 		upPanelReaders.add(deleteButtonReaders);
 		upPanelReaders.add(editButtonReaders);
 		upPanelReaders.add(searchButtonReaders);
+		upPanelReaders.add(restartButtonReaders);
+		upPanelReaders.add(comboBoxReaders);
 
 		// -------------------------------------------------- info
 		upPanelInfo.add(addButtonInfo);
 		upPanelInfo.add(deleteButtonInfo);
 		upPanelInfo.add(editButtonInfo);
 		upPanelInfo.add(searchButtonInfo);
+		upPanelInfo.add(restartButtonInfo);
+		upPanelInfo.add(comboBoxInfo);
+
+		// -------------------------------------------------- search
+		upPanelSearch.add(searchButton);
+		upPanelSearch.add(comboBoxSearchBooks);
+		upPanelSearch.add(comboBoxSearchReaders);
+
 		this.add(tab);
 
 //		 middlePanel
@@ -207,19 +236,19 @@ public class MainFrame extends JFrame {
 		downPanelBooks.add(booksScrollPane);
 		booksScrollPane.setPreferredSize(new Dimension(600, 100));
 		booksTable.setModel(DBHelper.getAllData("BOOKS"));
-		booksTable.addMouseListener(new booksTableListener());
+		booksTable.addMouseListener(new BooksTableListener());
 
 		// -------------------------------------------------- readers
 		downPanelReaders.add(readersScrollPane);
 		readersScrollPane.setPreferredSize(new Dimension(600, 100));
 		readersTable.setModel(DBHelper.getAllData("READERS"));
-		readersTable.addMouseListener(new readersTableListener());
+		readersTable.addMouseListener(new ReadersTableListener());
 
 		// -------------------------------------------------- info
 		downPanelInfo.add(infoScrollPane);
 		infoScrollPane.setPreferredSize(new Dimension());
 		infoTable.setModel(DBHelper.getAllData("INFO"));
-		infoTable.addMouseListener(new infoTableListener());
+		infoTable.addMouseListener(new InfoTableListener());
 
 //		 booksPanelPane
 		booksPanel.setLayout(new GridLayout(3, 1));
@@ -239,19 +268,38 @@ public class MainFrame extends JFrame {
 		infoPanel.add(upPanelInfo);
 		infoPanel.add(middlePanelInfo);
 		infoPanel.add(infoScrollPane);
+//       searchPanelPane
+		searchPanel.setLayout(new GridLayout(3, 1));
+		searchPanel.setSize(700, 600);
+		searchPanel.add(upPanelSearch);
 
 //		ButtonActionListener
 		// -------------------------------------------------- addBooks
 		addButtonBooks.addActionListener(new AddBooksAction());
+		restartButtonBooks.addActionListener(new RestartActionBooks());
 		// -------------------------------------------------- addReaders
 		addButtonReaders.addActionListener(new AddReadersAction());
+		restartButtonReaders.addActionListener(new RestartActionReaders());
 		// -------------------------------------------------- addInfo
 		addButtonInfo.addActionListener(new AddInfoAction());
-		
+		restartButtonInfo.addActionListener(new RestartActionInfo());
+		// -------------------------------------------------- search
+		searchButtonBooks.addActionListener(new SearchActionBooks());
+		searchButtonReaders.addActionListener(new SearchActionReaders());
+		searchButtonInfo.addActionListener(new SearchActionInfo());
+//		searchButton.addActionListener(new SearchAction());
+//		fillCombo
+		// -------------------------------------------------- books
+		DBHelper.fillCombo(comboBoxBooks, "BOOKNAME" ,"BOOKS");
+		// -------------------------------------------------- readers
+		DBHelper.fillCombo(comboBoxReaders, "READERSNAME", "READERS");
+		// -------------------------------------------------- info
+		DBHelper.fillCombo(comboBoxInfo, "READERSID", "INFO");
+
 //		ButtonDeleteListener
-		
+
 		deleteButtonBooks.addActionListener(new DeleteBooksAction());
-		
+
 		deleteButtonReaders.addActionListener(new DeleteReadersAction());
 
 		this.setVisible(true);
@@ -287,6 +335,7 @@ public class MainFrame extends JFrame {
 				state.setString(4, authorName);
 				state.execute();
 				booksTable.setModel(DBHelper.getAllData("BOOKS"));
+				DBHelper.fillCombo(comboBoxBooks, "BOOKNAME" ,"BOOKS");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -318,6 +367,7 @@ public class MainFrame extends JFrame {
 				state.setString(3, readersAdress);
 				state.execute();
 				readersTable.setModel(DBHelper.getAllData("READERS"));
+				DBHelper.fillCombo(comboBoxReaders, "READERSNAME", "READERS");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -333,7 +383,7 @@ public class MainFrame extends JFrame {
 			String infoTakingDate = infoTakingDateTF.getText();
 			String infoReturnDate = infoReturnDateTF.getText();
 			String infoComment = infoCommentTF.getText();
-			
+
 			clearInfoPane();
 		}
 	}// end AddInfoAction
@@ -350,14 +400,15 @@ public class MainFrame extends JFrame {
 				state.setInt(1, id);
 				state.execute();
 				booksTable.setModel(DBHelper.getAllData("BOOKS"));
+				DBHelper.fillCombo(comboBoxBooks, "BOOKNAME" ,"BOOKS");
 				id = -1;
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
-	}//end DeleteBooksAction
-	
+	}// end DeleteBooksAction
+
 	class DeleteReadersAction implements ActionListener {
 
 		@Override
@@ -370,15 +421,149 @@ public class MainFrame extends JFrame {
 				state.setInt(1, id);
 				state.execute();
 				readersTable.setModel(DBHelper.getAllData("READERS"));
+				DBHelper.fillCombo(comboBoxReaders, "READERSNAME", "READERS");
 				id = -1;
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
-	}//end DeleteReadersAction
+	}// end DeleteReadersAction
 
-	class booksTableListener implements MouseListener {
+	class SearchActionBooks implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            String item = comboBoxBooks.getSelectedItem().toString();
+            String [] content = item.split(" ");
+            int personId = Integer.parseInt(content[0]);
+
+            conn = DBHelper.getConnection();
+            String sql = "SELECT * FROM BOOKS WHERE id=?";
+            try {
+                state = conn.prepareStatement(sql);
+                state.setInt(1, personId);
+                result = state.executeQuery();
+                booksTable.setModel(new MyModel(result));
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+	}
+	class RestartActionBooks implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+                conn = DBHelper.getConnection();
+
+                String sql = "SELECT * FROM BOOKS";
+
+                try {
+                    state = conn.prepareStatement(sql);
+                    state.execute();
+                    booksTable.setModel(DBHelper.getAllData("BOOKS"));
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                }
+    }
+	class RestartActionReaders implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+                conn = DBHelper.getConnection();
+
+                String sql = "SELECT * FROM READERS";
+
+                try {
+                    state = conn.prepareStatement(sql);
+                    state.execute();
+                    readersTable.setModel(DBHelper.getAllData("READERS"));
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                }
+    }	
+	class RestartActionInfo implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+                conn = DBHelper.getConnection();
+
+                String sql = "SELECT * FROM INFO";
+
+                try {
+                    state = conn.prepareStatement(sql);
+                    state.execute();
+                    infoTable.setModel(DBHelper.getAllData("INFO"));
+
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                }
+    }	
+	class SearchActionReaders implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            String item = comboBoxReaders.getSelectedItem().toString();
+            String [] content = item.split(" ");
+            int personId = Integer.parseInt(content[0]);
+
+            conn = DBHelper.getConnection();
+            String sql = "SELECT * FROM READERS WHERE id=?";
+            try {
+                state = conn.prepareStatement(sql);
+                state.setInt(1, personId);
+                result = state.executeQuery();
+                readersTable.setModel(new MyModel(result));
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+	}
+	class SearchActionInfo implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+            String item = comboBoxInfo.getSelectedItem().toString();
+            String [] content = item.split(" ");
+            int personId = Integer.parseInt(content[0]);
+
+            conn = DBHelper.getConnection();
+            String sql = "SELECT * FROM INFO WHERE id=?";
+            try {
+                state = conn.prepareStatement(sql);
+                state.setInt(1, personId);
+                result = state.executeQuery();
+                infoTable.setModel(new MyModel(result));
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+	}
+
+
+	class BooksTableListener implements MouseListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -413,7 +598,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	class readersTableListener implements MouseListener {
+	class ReadersTableListener implements MouseListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -448,7 +633,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	class infoTableListener implements MouseListener {
+	class InfoTableListener implements MouseListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
