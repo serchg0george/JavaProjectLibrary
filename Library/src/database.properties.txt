@@ -1,0 +1,3 @@
+url = jdbc:h2:D:\\H2 Java\\123\\LibraryDB
+username = sa
+password = sa
