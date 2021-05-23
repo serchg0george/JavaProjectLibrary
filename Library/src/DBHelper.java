@@ -12,6 +12,7 @@ public class DBHelper {
 	public static PreparedStatement state = null;
 	public static ResultSet result = null;
 
+
 	static void fillCombo(JComboBox<String> combo, String variable, String nameTable) {
 
 		conn = getConnection();
@@ -29,6 +30,7 @@ public class DBHelper {
 			e.printStackTrace();
 		}
 	}
+
 	
 	static void fillComboInfo(JComboBox<String> combo) {
 
