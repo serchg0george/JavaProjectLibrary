@@ -1,8 +1,11 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import javax.swing.JComboBox;
 
@@ -53,19 +56,30 @@ public class DBHelper {
 
 	public static Connection getConnection() {
 
-		try {
-			Class.forName("org.h2.Driver");
-			conn = DriverManager.getConnection("jdbc:h2:D:\\\\H2 Java\\\\LibraryDB\\\\LibraryDB;AUTO_SERVER=TRUE", "sa",
-					"sa");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return conn;
-	}// end getConnection
+        try {
+            File file = new File("C:\\Users\\Serchg\\git\\JavaProjectLibrary\\Library\\config.txt");
+            Scanner sc = new Scanner(file);
+            String connString = "",username = "",password = "";
+            while(sc.hasNextLine()) {
+                connString = sc.nextLine().trim();
+                username = sc.nextLine().trim();
+                password = sc.nextLine().trim();
+            }
+
+            Class.forName("org.h2.Driver");
+            conn = DriverManager.getConnection(connString, username, password);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return conn;
+    }//end method
 
 	public static MyModel getAllData(String tableName) {
 

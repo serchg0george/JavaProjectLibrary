@@ -1,3 +1,0 @@
-url = jdbc:h2:D:\\H2 Java\\LibraryDB\\LibraryDB;AUTO_SERVER=TRUE
-username = sa
-password = sa
